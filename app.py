@@ -95,7 +95,7 @@ def create_pdf(results1, results2, results3, results4, results5):
         pdf.cell(110, 8, txt=f"{key}:", ln=0)
         pdf.cell(90, 8, txt=f"{value[1]:.2f} {value[2]}" if isinstance(value[1], (int, float)) else f"{value[1]} {value[2]}", ln=1)
     
-    return pdf
+    return pdf.output(dest="S")
 
 def cycle_journale():
     global Qbd, Qbd_prime
@@ -207,10 +207,8 @@ if st.button("Calculer"):
     display_section("5. Exigences de puissance solaire", results5)
     
     # Create PDF
-    pdf = create_pdf(results1, results2, results3, results4, results5)
-    
-    # Generate download link
-    pdf_output = pdf.output(dest="S").encode("latin-1")
-    b64 = base64.b64encode(pdf_output).decode()
-    href = f'<a href="data:application/octet-stream;base64,{b64}" download="battery_calculation_report.pdf">Télécharger le rapport PDF</a>'
-    st.markdown(href, unsafe_allow_html=True)
+    pdf_bytes = create_pdf(results1, results2, results3, results4, results5)
+    if pdf_bytes:
+        b64 = base64.b64encode(pdf_bytes).decode()
+        href = f'<a href="data:application/pdf;base64,{b64}" download="battery_report.pdf">Télécharger le rapport PDF</a>'
+        st.markdown(href, unsafe_allow_html=True)
